@@ -36,10 +36,21 @@ func (l *linkedList[T]) headTail() (T, *linkedList[T], bool) {
   return l.elem, l.next, true
 }
 
-func (l *linkedList[T]) concat(r stackWithCat[T]) stackWithCat[T] {
+func (l *linkedList[T]) concatImpl(r *linkedList[T]) stackWithCat[T] {
   head, tail, ok := l.headTail()
   if !ok { return r }
   return tail.concat(r).cons(head)
+}
+
+// Apparently we cannot enforce that r is *linkedList[T] by using Go's interface, so
+// check the concrete type of r at runtime
+func (l *linkedList[T]) concat(r stackWithCat[T]) stackWithCat[T] {
+  switch t := r.(type) {
+  case *linkedList[T]:
+    return l.concatImpl(t)
+  default:
+    panic("Should not happen")
+  }
 }
 
 func (l *linkedList[T]) update(i int, elem T) (stackWithCat[T], bool) {
