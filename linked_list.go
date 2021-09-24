@@ -9,8 +9,12 @@ func (l *linkedList[T]) isEmpty() bool {
   return l == nil;
 }
 
-func (l *linkedList[T]) cons(elem T) stackWithCat[T] {
+func (l *linkedList[T]) consImpl(elem T) *linkedList[T] {
   return &linkedList[T] {elem:elem, next:l}
+}
+
+func (l *linkedList[T]) cons(elem T) stackWithCat[T] {
+  return l.consImpl(elem)
 }
 
 func (l *linkedList[T]) head() (T, bool) {
@@ -36,10 +40,10 @@ func (l *linkedList[T]) headTail() (T, *linkedList[T], bool) {
   return l.elem, l.next, true
 }
 
-func (l *linkedList[T]) concatImpl(r *linkedList[T]) stackWithCat[T] {
+func (l *linkedList[T]) concatImpl(r *linkedList[T]) *linkedList[T] {
   head, tail, ok := l.headTail()
   if !ok { return r }
-  return tail.concat(r).cons(head)
+  return tail.concatImpl(r).consImpl(head)
 }
 
 // Apparently we cannot enforce that r is *linkedList[T] by using Go's interface, so
@@ -68,4 +72,17 @@ func (l *linkedList[T]) update(i int, elem T) (stackWithCat[T], bool) {
     }
     return newtail.cons(head), true
   }
+}
+
+func (l *linkedList[T]) rev() *linkedList[T] {
+  var newList *linkedList[T]
+  for !l.isEmpty() {
+    head, tail, ok := l.headTail()
+    if !ok {
+      break
+    }
+    newList = newList.consImpl(head)
+    l = tail
+  }
+  return newList
 }
