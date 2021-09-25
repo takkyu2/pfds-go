@@ -25,11 +25,15 @@ func (l *linkedList[T]) head() (T, bool) {
   return l.elem, true;
 }
 
-func (l *linkedList[T]) tail() (stackWithCat[T], bool) {
+func (l *linkedList[T]) tailImpl() (*linkedList[T], bool) {
   if l == nil {
     return l, false
   }
   return l.next, true;
+}
+
+func (l *linkedList[T]) tail() (stackWithCat[T], bool) {
+  return l.tailImpl()
 }
 
 func (l *linkedList[T]) headTail() (T, *linkedList[T], bool) {
