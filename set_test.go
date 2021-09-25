@@ -63,10 +63,10 @@ func toListTest(set *unbalancedSet[int], t *testing.T) {
 
 func testRBTInvariant(t *testing.T) {
   var set *redBlackTree[int]
-  for i := 999999; i >= 0; i-- {
+  for i := 99999; i >= 0; i-- {
     set = set.insertImpl(i)
   }
-  verifyRBT(set, 1000000, t)
+  verifyRBT(set, 100000, t)
 }
 
 func checkChild[T ordered](rbt *redBlackTree[T]) bool {
