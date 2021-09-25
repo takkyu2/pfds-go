@@ -40,7 +40,21 @@ func (s *unbalancedSet[T]) insert(t T) set[T] {
   return s.insertImpl(t);
 }
 
+func toListHelper[T ordered](list *linkedList[T], set *unbalancedSet[T]) *linkedList[T] {
+  if set.isEmpty() { return list }
+  list = toListHelper(list, set.left)
+  list = list.consImpl(set.elem)
+  list = toListHelper(list, set.right)
+  return list
+}
 
+func (s *unbalancedSet[T]) toList() *linkedList[T] {
+  var list *linkedList[T]
+  return toListHelper(list, s).rev()
+}
+
+// NOTE: It would be better to implement generic unbalancedSet and adapt it to map, 
+// but I can't figure out how to do that; It seems visitor pattern does not work...
 type unbalancedFiniteMap[K ordered, V any] struct {
   elem orderedKeyValue[K, V]
   left *unbalancedFiniteMap[K, V]
