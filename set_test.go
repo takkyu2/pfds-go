@@ -98,6 +98,8 @@ func checkNode[T ordered](rbt *redBlackTree[T], blackNum int, ch chan<-int, t *t
   checkNode(rbt.right, blackNum, ch, t)
 }
 
+// not really effcient, since the main goroutine must do loop over remSignals
+// times; this is not needed if we know the number of leafs in rbt in advance.
 func verifyRBT[T ordered](rbt *redBlackTree[T], rbtSz int, t *testing.T) {
   ch := make(chan int)
 
