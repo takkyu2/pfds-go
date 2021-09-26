@@ -1,8 +1,6 @@
 package list
 
-import (
-	"github.com/takkyu2/pfds-go/internal/lazy"
-)
+import "github.com/takkyu2/pfds-go/internal/lazy"
 
 type StreamInterface[T any] interface {
 	Concat(StreamInterface[T]) StreamInterface[T]

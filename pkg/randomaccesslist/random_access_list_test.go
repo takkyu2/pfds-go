@@ -1,8 +1,6 @@
 package randomaccesslist
 
-import (
-	"testing"
-)
+import "testing"
 
 func TestRAL(t *testing.T) {
 	var ral BinaryRAL[int]
