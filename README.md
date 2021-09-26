@@ -1,12 +1,14 @@
 # Purely Functional Data Structures in Go
 An implementation of the immutable data structures in Okasaki's textbook, "Purely Functional Data Structures", in Go.
 
+Still work in progress.
+
 ## Requirements
 A Go compiler supporting Generics, e.g., Go 1.18, accessible by gotip as of now, is necessary.
 
 ## Disclaimers
 * Since Go 1.17 with `-gcflags=-G=3` flag does not support exporting Generic functions, types, etc., the code cannot be compiled by Go 1.17. I could put everything in a single main package, but that would hurt the readability.
-* Polymorphic recursion seems impossible in Go generics (compiler hangs up)
+* Polymorphic recursion seems impossible in Go generics (compiler hangs up) :(
 
 ## Others
 * I guess Go's garbage collection and easy concurrency may be a good fit for PFDS :)
