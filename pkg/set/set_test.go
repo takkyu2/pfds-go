@@ -1,56 +1,57 @@
-package main
+package set
 
 import (
 	"testing"
+	"github.com/takkyu2/pfds-go/internal/constraints"
 )
 
 func TestSet(t *testing.T) {
-  var set *unbalancedSet[int]
+  var set *UnbalancedSet[int]
   intSetTest(set, t)
   toListTest(set, t)
-  var finiteMap *unbalancedFiniteMap[rune, int]
+  var finiteMap *UnbalancedFiniteMap[rune, int]
   intMapTest(finiteMap, t)
-  var rbt *redBlackTree[int]
+  var rbt *RedBlackTree[int]
   intSetTest(rbt, t)
   testRBTInvariant(t)
 }
 
-func intSetTest(set set[int], t *testing.T) {
+func intSetTest(set Set[int], t *testing.T) {
   for i := 0; i < 10; i++ {
-    if set.member(i) {
+    if set.Member(i) {
       t.Errorf("%d should not be a member", i)
     }
-    set = set.insert(i)
-    if !set.member(i) {
+    set = set.Insert(i)
+    if !set.Member(i) {
       t.Errorf("%d should be a member", i)
     }
   }
 }
 
-func intMapTest(finiteMap finiteMap[rune, int], t *testing.T) {
+func intMapTest(finiteMap FiniteMap[rune, int], t *testing.T) {
   for i, ch := range "こんにちは！" {
-    _, ok := finiteMap.lookup(ch)
+    _, ok := finiteMap.Lookup(ch)
     if ok {
       t.Errorf("%c should not be a member", ch)
     }
-    finiteMap = finiteMap.bind(ch, i)
-    v, ok := finiteMap.lookup(ch)
+    finiteMap = finiteMap.Bind(ch, i)
+    v, ok := finiteMap.Lookup(ch)
     if !ok || v != i {
       t.Errorf("%c should be a member", ch)
     }
   }
 }
 
-func toListTest(set *unbalancedSet[int], t *testing.T) {
+func toListTest(set *UnbalancedSet[int], t *testing.T) {
   for i := 99; i >= 0; i-- {
-    set = set.insertImpl(i)
-    if !set.member(i) {
+    set = set.InsertImpl(i)
+    if !set.Member(i) {
       t.Errorf("%d should be a member", i)
     }
   }
-  list := set.toList()
+  list := set.ToList()
   for i := 0; i < 100; i++ {
-    head, tail, ok := list.headTail()
+    head, tail, ok := list.HeadTail()
     if !ok {
       t.Errorf("Error in tolist")
     }
@@ -62,29 +63,29 @@ func toListTest(set *unbalancedSet[int], t *testing.T) {
 }
 
 func testRBTInvariant(t *testing.T) {
-  var set *redBlackTree[int]
+  var set *RedBlackTree[int]
   for i := 99999; i >= 0; i-- {
-    set = set.insertImpl(i)
+    set = set.InsertImpl(i)
   }
   verifyRBT(set, 100000, t)
 }
 
-func checkChild[T ordered](rbt *redBlackTree[T]) bool {
-  if rbt.isEmpty() { return true }
+func checkChild[T constraints.Ordered](rbt *RedBlackTree[T]) bool {
+  if rbt.IsEmpty() { return true }
   color, left, right := rbt.color, rbt.left, rbt.right
   if color == Black { return true }
-  if left.isEmpty() && right.isEmpty() { return true }
-  if left.isEmpty() { return right.color == Black }
-  if right.isEmpty() { return left.color == Black }
+  if left.IsEmpty() && right.IsEmpty() { return true }
+  if left.IsEmpty() { return right.color == Black }
+  if right.IsEmpty() { return left.color == Black }
   return left.color == Black && right.color == Black
 }
 
-func checkNode[T ordered](rbt *redBlackTree[T], blackNum int, ch chan<-int, t *testing.T) {
-  if rbt.isEmpty() { return }
+func checkNode[T constraints.Ordered](rbt *RedBlackTree[T], blackNum int, ch chan<-int, t *testing.T) {
+  if rbt.IsEmpty() { return }
   if rbt.color == Black {
     blackNum++
   }
-  if rbt.left.isEmpty() && rbt.right.isEmpty() {
+  if rbt.left.IsEmpty() && rbt.right.IsEmpty() {
     ch <- blackNum
     ch <- -1
     return
@@ -100,11 +101,11 @@ func checkNode[T ordered](rbt *redBlackTree[T], blackNum int, ch chan<-int, t *t
 
 // not really effcient, since the main goroutine must do loop over remSignals
 // times; this is not needed if we know the number of leafs in rbt in advance.
-func verifyRBT[T ordered](rbt *redBlackTree[T], rbtSz int, t *testing.T) {
+func verifyRBT[T constraints.Ordered](rbt *RedBlackTree[T], rbtSz int, t *testing.T) {
   ch := make(chan int)
 
   remSignals := rbtSz
-  var set *unbalancedSet[int]
+  var set *UnbalancedSet[int]
   go checkNode(rbt, 0, ch, t)
   for remSignals > 0 {
     val := <- ch
@@ -112,11 +113,11 @@ func verifyRBT[T ordered](rbt *redBlackTree[T], rbtSz int, t *testing.T) {
       remSignals--
       continue
     }
-    set = set.insertImpl(val)
+    set = set.InsertImpl(val)
   }
-  list := set.toList()
-  head, tail, ok := list.headTail()
-  if ok && !tail.isEmpty() {
+  list := set.ToList()
+  head, tail, ok := list.HeadTail()
+  if ok && !tail.IsEmpty() {
     t.Errorf("Error in RBT, Every path to leaf should have the same number of blacks")
     return
   }
